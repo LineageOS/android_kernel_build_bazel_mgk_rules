@@ -107,7 +107,8 @@ def define_mgk(
         platform_device_user_modules,
         symbol_list,
         dtb_files = None,
-        dtbo_config = None):
+        dtbo_config = None,
+        build_dtbo_image = False):
     mgk_defconfig_overlays = []
     for o in DEFCONFIG_OVERLAYS.split(" "):
         if o != "":
@@ -270,18 +271,20 @@ def define_mgk(
                 kmi_symbol_list_strict_mode = False,
                 collect_unstripped_modules = True,
             )
-            kernel_images(
-                name = "{}_kernel_images.{}".format(name, build),
-                kernel_build = ":{}.{}".format(name, build),
-                build_dtbo = True,
-                dtbo_srcs = select({
-                    "//build/bazel_mgk_rules:kernel_version_6.1"     : ["//kernel_device_modules-{}/arch/arm64/boot/dts:mtk_dtbo".format("6.1")],
-                    "//build/bazel_mgk_rules:kernel_version_6.6"     : ["//kernel_device_modules-{}/arch/arm64/boot/dts:mtk_dtbo".format("6.6")],
-                    "//build/bazel_mgk_rules:kernel_version_mainline": ["//kernel_device_modules-{}/arch/arm64/boot/dts:mtk_dtbo".format("mainline")],
-                    "//conditions:default"                           : ["//kernel_device_modules/arch/arm64/boot/dts:mtk_dtbo"],
-                }),
-                dtbo_config = dtbo_config,
-                kernel_modules_install = ":kernel_modules_install",
+            if build_dtbo_image:
+                kernel_images(
+                    name = "{}_kernel_images.{}".format(name, build),
+                    kernel_build = ":{}.{}".format(name, build),
+                    build_dtbo = True,
+                    dtbo_srcs = select({
+                        "//build/bazel_mgk_rules:kernel_version_6.1"     : ["//kernel_device_modules-{}/arch/arm64/boot/dts:mtk_dtbo".format("6.1")],
+                        "//build/bazel_mgk_rules:kernel_version_6.6"     : ["//kernel_device_modules-{}/arch/arm64/boot/dts:mtk_dtbo".format("6.6")],
+                        "//build/bazel_mgk_rules:kernel_version_mainline": ["//kernel_device_modules-{}/arch/arm64/boot/dts:mtk_dtbo".format("mainline")],
+                        "//conditions:default"                           : ["//kernel_device_modules/arch/arm64/boot/dts:mtk_dtbo"],
+                    }),
+                    dtbo_config = dtbo_config,
+                    kernel_modules_install = ":kernel_modules_install",
+                )
             )
         # internal
         kernel_abi(
@@ -373,9 +376,8 @@ def define_mgk(
                 }) + [
                     ":{}.{}".format(name, build),
                     ":{}_internal_modules_install.{}".format(name, build),
-                    ":{}_kernel_images.{}".format(name, build),
                     ":{}_merged_uapi_headers.{}".format(name, build),
-                ],
+                ] + ([":{}_kernel_images.{}".format(name, build)] if build_dtbo_image else []),
                 flat = False,
             )
         else:
@@ -395,9 +397,8 @@ def define_mgk(
                 + [
                     ":{}.{}".format(name, build),
                     ":{}_internal_modules_install.{}".format(name, build),
-                    ":{}_kernel_images.{}".format(name, build),
                     ":{}_merged_uapi_headers.{}".format(name, build),
-                ] + ([":{}.{}/{}".format(name, build, m) for m in common_user_modules] if build == "user" else []),
+                ] + ([":{}.{}/{}".format(name, build, m) for m in common_user_modules] if build == "user" else []) + ([":{}_kernel_images.{}".format(name, build)] if build_dtbo_image else []),
                 flat = False,
             )
         # customer
@@ -447,9 +448,8 @@ def define_mgk(
                 }) + [
                     ":{}.{}".format(name, build),
                     ":{}_customer_modules_install.{}".format(name, build),
-                    ":{}_kernel_images.{}".format(name, build),
                     ":{}_merged_uapi_headers.{}".format(name, build),
-                ],
+                ] + ([":{}_kernel_images.{}".format(name, build)] if build_dtbo_image else []),
                 flat = False,
             )
         else:
@@ -469,9 +469,8 @@ def define_mgk(
                 + [
                     ":{}.{}".format(name, build),
                     ":{}_customer_modules_install.{}".format(name, build),
-                    ":{}_kernel_images.{}".format(name, build),
                     ":{}_merged_uapi_headers.{}".format(name, build),
-                ] + ([":{}.{}/{}".format(name, build, m) for m in common_user_modules] if build == "user" else []),
+                ] + ([":{}.{}/{}".format(name, build, m) for m in common_user_modules] if build == "user" else []) + ([":{}_kernel_images.{}".format(name, build)] if build_dtbo_image else []),
                 flat = False,
             )
 
