@@ -16,6 +16,24 @@
       "message": "Lamu would need to opt-in to this in order to avoid build failure for this to get merged",
       "revId": "d176df0efa9313cbad2d9002ce86fb77b4ea1f76",
       "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9df23efe_35f77f20",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 32620
+      },
+      "writtenOn": "2026-10-30T17:12:29Z",
+      "side": 1,
+      "message": "Aware. Trying the changes right now.",
+      "parentUuid": "063767a8_6543e5e3",
+      "revId": "d176df0efa9313cbad2d9002ce86fb77b4ea1f76",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71"
     }
   ]
 }
